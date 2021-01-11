@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -32,16 +33,29 @@ public class LocationViewModel extends AndroidViewModel {
             public void onLocationChanged(@NonNull Location location) {
                 locationData.setValue(location.toString());
             }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
         };
-        permission.setValue(false);
 
         if (ContextCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             permission.setValue(false);
         } else {
             permission.setValue(true);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 200, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, locationListener);
         }
     }
-
 
 }
