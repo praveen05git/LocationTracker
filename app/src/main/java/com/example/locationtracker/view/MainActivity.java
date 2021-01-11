@@ -51,5 +51,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        locationViewModel.dataUploaded.observe(this, dataUploaded -> {
+            if (dataUploaded) {
+                Toast.makeText(getApplication(), "Data Uploaded", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 }
