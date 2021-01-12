@@ -2,6 +2,7 @@ package com.example.locationtracker.view;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.locationtracker.R;
 import com.example.locationtracker.viewmodel.LocationViewModel;
+import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,7 +62,9 @@ public class MainActivity extends AppCompatActivity {
 
         locationViewModel.dataUploaded.observe(this, dataUploaded -> {
             if (dataUploaded) {
-                Toast.makeText(getApplication(), "Data Uploaded", Toast.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(android.R.id.content), "Data Uploaded to cloud", Snackbar.LENGTH_LONG)
+                        .setBackgroundTint(Color.parseColor("#534BAE"))
+                        .setTextColor(Color.parseColor("#ffffff")).show();
                 locationViewModel.getData();
                 locationViewModel.getRecentTime();
             }
