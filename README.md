@@ -5,8 +5,8 @@
 </p>
 </br>
 <p align="center">
-  <img src="/previews/weatherApp1.png" width="30%" />
-  <img src="/previews/weatherApp4.png" width="30%" />
+  <img src="/previews/LocationTracker.png" width="30%" />
+  <img src="/previews/LocationTrackerGif1.gif" width="30%" />
 </p>
 
 ## Features
