@@ -15,6 +15,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.locationtracker.model.LocationDetail;
+import com.example.locationtracker.model.RecentData;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,11 +34,19 @@ public class LocationViewModel extends AndroidViewModel {
     public MutableLiveData<Boolean> permission = new MutableLiveData<>();
     public MutableLiveData<Boolean> dataUploaded = new MutableLiveData<>();
     public MutableLiveData<String> uploadCounts = new MutableLiveData<>();
+    public MutableLiveData<String> recentUpload = new MutableLiveData<>();
+
     private List<LocationDetail> newLocationList = new ArrayList<>();
+
     private LocationDetail locationDetail;
+    private RecentData recentData;
+
     private LocationManager locationManager;
     private LocationListener locationListener;
+
     private DatabaseReference databaseReference;
+    private DatabaseReference recentDataReference;
+
     private String dateTime = new SimpleDateFormat("dd/MM/yyy hh:mm:ss a", Locale.getDefault()).format(new Date());
     private String today = new SimpleDateFormat("dd-MM-yyy", Locale.getDefault()).format(new Date());
 
@@ -46,7 +55,6 @@ public class LocationViewModel extends AndroidViewModel {
     }
 
     public void checkLocation() {
-
         locationManager = (LocationManager) getApplication().getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
@@ -75,14 +83,21 @@ public class LocationViewModel extends AndroidViewModel {
             permission.setValue(false);
         } else {
             permission.setValue(true);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100000, 0, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, locationListener);
         }
     }
 
     public void dataUpload() {
         databaseReference = FirebaseDatabase.getInstance("https://locationtracker-8c20b-default-rtdb.firebaseio.com/").getReference("locationData");
+        recentDataReference = FirebaseDatabase.getInstance("https://locationtracker-8c20b-default-rtdb.firebaseio.com/").getReference("recentData");
+
+        dateTime = new SimpleDateFormat("dd/MM/yyy hh:mm:ss a", Locale.getDefault()).format(new Date());
         locationDetail = new LocationDetail(locationData.getValue(), dateTime);
+        recentData = new RecentData(dateTime);
+
         databaseReference.child(today).child(String.valueOf(System.nanoTime())).setValue(locationDetail);
+        recentDataReference.child(today).setValue(dateTime);
+
         dataUploaded.setValue(true);
     }
 
@@ -97,6 +112,7 @@ public class LocationViewModel extends AndroidViewModel {
                     locationDetail = ds.getValue(LocationDetail.class);
                     newLocationList.add(locationDetail);
                     uploadCounts.setValue(String.valueOf(newLocationList.size()));
+                    getRecentTime();
                 }
             }
 
@@ -106,6 +122,25 @@ public class LocationViewModel extends AndroidViewModel {
             }
         });
 
+    }
+
+    public void getRecentTime() {
+        recentDataReference = FirebaseDatabase.getInstance("https://locationtracker-8c20b-default-rtdb.firebaseio.com/").getReference("recentData/" + today + "/");
+        recentDataReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    recentUpload.setValue(dataSnapshot.getValue().toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 }
