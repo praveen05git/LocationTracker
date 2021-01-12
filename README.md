@@ -23,8 +23,3 @@
 - Used Firebase Realtime Database for Cloud storage and Retrieval
 - Implemented MutableLiveData and Observed it for displaying required information in a Reactive manner
 </br>
-
-<p align="center">
-  <img src="/previews/weatherGif1.gif" width="30%" />
-  <img src="/previews/weatherGif2.gif" width="30%" />
-</p>
