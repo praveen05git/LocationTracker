@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
         locationViewModel.locationData.observe(this, hasData -> {
             if (hasData != null) {
-                Toast.makeText(getApplication(), hasData, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplication(), "Location Fetched", Toast.LENGTH_SHORT).show();
             }
         });
 

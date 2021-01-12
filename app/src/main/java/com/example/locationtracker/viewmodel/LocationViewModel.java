@@ -84,7 +84,7 @@ public class LocationViewModel extends AndroidViewModel {
             permission.setValue(false);
         } else {
             permission.setValue(true);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000, 0, locationListener);
         }
     }
 
