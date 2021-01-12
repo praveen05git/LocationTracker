@@ -18,6 +18,10 @@ import com.example.locationtracker.model.LocationDetail;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class LocationViewModel extends AndroidViewModel {
 
     public MutableLiveData<String> locationData = new MutableLiveData<>();
@@ -27,6 +31,8 @@ public class LocationViewModel extends AndroidViewModel {
     private LocationManager locationManager;
     private LocationListener locationListener;
     private DatabaseReference databaseReference;
+    private String dateTime;
+    private String today;
 
     public LocationViewModel(@NonNull Application application) {
         super(application);
@@ -68,8 +74,10 @@ public class LocationViewModel extends AndroidViewModel {
 
     public void dataUpload() {
         databaseReference = FirebaseDatabase.getInstance("https://locationtracker-8c20b-default-rtdb.firebaseio.com/").getReference("locationData");
-        locationDetail = new LocationDetail(locationData.getValue(), System.nanoTime());
-        databaseReference.child(String.valueOf(System.nanoTime())).setValue(locationDetail);
+        dateTime = new SimpleDateFormat("dd/MM/yyy hh:mm:ss a", Locale.getDefault()).format(new Date());
+        today = new SimpleDateFormat("dd-MM-yyy", Locale.getDefault()).format(new Date());
+        locationDetail = new LocationDetail(locationData.getValue(), dateTime);
+        databaseReference.child(today).setValue(locationDetail);
         dataUploaded.setValue(true);
     }
 

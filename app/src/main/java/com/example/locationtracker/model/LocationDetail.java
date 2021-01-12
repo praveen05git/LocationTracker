@@ -2,9 +2,9 @@ package com.example.locationtracker.model;
 
 public class LocationDetail {
     public String location;
-    public long updatedTime;
+    public String updatedTime;
 
-    public LocationDetail(String location, long updatedTime) {
+    public LocationDetail(String location, String updatedTime) {
         this.location = location;
         this.updatedTime = updatedTime;
     }
@@ -13,7 +13,7 @@ public class LocationDetail {
         return location;
     }
 
-    public long getUpdatedTime() {
+    public String getUpdatedTime() {
         return updatedTime;
     }
 }
