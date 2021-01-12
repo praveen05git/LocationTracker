@@ -5,8 +5,8 @@
 </p>
 </br>
 <p align="center">
-  <img src="/previews/weatherApp1.png" width="30%" />
-  <img src="/previews/weatherApp4.png" width="30%" />
+  <img src="/previews/LocationTracker.png" width="30%" />
+  <img src="/previews/LocationTrackerGif1.gif" width="30%" />
 </p>
 
 ## Features
@@ -23,8 +23,3 @@
 - Used Firebase Realtime Database for Cloud storage and Retrieval
 - Implemented MutableLiveData and Observed it for displaying required information in a Reactive manner
 </br>
-
-<p align="center">
-  <img src="/previews/weatherGif1.gif" width="30%" />
-  <img src="/previews/weatherGif2.gif" width="30%" />
-</p>
