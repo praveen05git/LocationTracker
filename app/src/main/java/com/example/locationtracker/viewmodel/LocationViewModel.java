@@ -8,6 +8,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -75,7 +76,7 @@ public class LocationViewModel extends AndroidViewModel {
 
             @Override
             public void onProviderDisabled(String s) {
-
+                Toast.makeText(getApplication(), "Turn on location", Toast.LENGTH_LONG).show();
             }
         };
 
