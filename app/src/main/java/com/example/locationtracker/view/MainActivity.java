@@ -3,6 +3,7 @@ package com.example.locationtracker.view;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,14 +17,17 @@ import com.example.locationtracker.viewmodel.LocationViewModel;
 public class MainActivity extends AppCompatActivity {
 
     private LocationViewModel locationViewModel;
+    private TextView countText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        countText = findViewById(R.id.counts);
         locationViewModel = new ViewModelProvider(this).get(LocationViewModel.class);
         locationViewModel.checkLocation();
+        locationViewModel.getData();
 
         observeViewModel();
     }
@@ -54,6 +58,15 @@ public class MainActivity extends AppCompatActivity {
         locationViewModel.dataUploaded.observe(this, dataUploaded -> {
             if (dataUploaded) {
                 Toast.makeText(getApplication(), "Data Uploaded", Toast.LENGTH_SHORT).show();
+                locationViewModel.getData();
+            }
+        });
+
+        locationViewModel.uploadCounts.observe(this, counts -> {
+            if (counts != null) {
+                countText.setText(counts);
+            } else {
+                countText.setText("No Data");
             }
         });
 

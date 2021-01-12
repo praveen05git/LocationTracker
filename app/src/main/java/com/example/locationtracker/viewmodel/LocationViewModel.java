@@ -15,11 +15,16 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.locationtracker.model.LocationDetail;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class LocationViewModel extends AndroidViewModel {
@@ -27,12 +32,14 @@ public class LocationViewModel extends AndroidViewModel {
     public MutableLiveData<String> locationData = new MutableLiveData<>();
     public MutableLiveData<Boolean> permission = new MutableLiveData<>();
     public MutableLiveData<Boolean> dataUploaded = new MutableLiveData<>();
+    public MutableLiveData<String> uploadCounts = new MutableLiveData<>();
+    private List<LocationDetail> newLocationList = new ArrayList<>();
     private LocationDetail locationDetail;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private DatabaseReference databaseReference;
-    private String dateTime;
-    private String today;
+    private String dateTime = new SimpleDateFormat("dd/MM/yyy hh:mm:ss a", Locale.getDefault()).format(new Date());
+    private String today = new SimpleDateFormat("dd-MM-yyy", Locale.getDefault()).format(new Date());
 
     public LocationViewModel(@NonNull Application application) {
         super(application);
@@ -74,11 +81,31 @@ public class LocationViewModel extends AndroidViewModel {
 
     public void dataUpload() {
         databaseReference = FirebaseDatabase.getInstance("https://locationtracker-8c20b-default-rtdb.firebaseio.com/").getReference("locationData");
-        dateTime = new SimpleDateFormat("dd/MM/yyy hh:mm:ss a", Locale.getDefault()).format(new Date());
-        today = new SimpleDateFormat("dd-MM-yyy", Locale.getDefault()).format(new Date());
         locationDetail = new LocationDetail(locationData.getValue(), dateTime);
-        databaseReference.child(today).setValue(locationDetail);
+        databaseReference.child(today).child(String.valueOf(System.nanoTime())).setValue(locationDetail);
         dataUploaded.setValue(true);
+    }
+
+    public void getData() {
+        newLocationList.clear();
+        databaseReference = FirebaseDatabase.getInstance("https://locationtracker-8c20b-default-rtdb.firebaseio.com/").getReference("locationData/" + today + "/");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                newLocationList.clear();
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    locationDetail = ds.getValue(LocationDetail.class);
+                    newLocationList.add(locationDetail);
+                    uploadCounts.setValue(String.valueOf(newLocationList.size()));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
 }
