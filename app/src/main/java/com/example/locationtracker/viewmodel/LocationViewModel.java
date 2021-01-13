@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,11 +30,11 @@ import java.util.Locale;
 
 public class LocationViewModel extends AndroidViewModel {
 
-    public MutableLiveData<String> locationData = new MutableLiveData<>();
-    public MutableLiveData<Boolean> permission = new MutableLiveData<>();
-    public MutableLiveData<Boolean> dataUploaded = new MutableLiveData<>();
-    public MutableLiveData<String> uploadCounts = new MutableLiveData<>();
-    public MutableLiveData<String> recentUpload = new MutableLiveData<>();
+    public MutableLiveData<String> locationLiveData = new MutableLiveData<>();
+    public MutableLiveData<Boolean> permissionLiveData = new MutableLiveData<>();
+    public MutableLiveData<Boolean> dataUploadedLiveData = new MutableLiveData<>();
+    public MutableLiveData<String> uploadCountsLiveData = new MutableLiveData<>();
+    public MutableLiveData<String> recentUploadLiveData = new MutableLiveData<>();
 
     private List<LocationDetail> newLocationList = new ArrayList<>();
 
@@ -45,8 +44,8 @@ public class LocationViewModel extends AndroidViewModel {
     private LocationManager locationManager;
     private LocationListener locationListener;
 
-    private DatabaseReference databaseReference;
-    private DatabaseReference recentDataReference;
+    private DatabaseReference locationDatabaseReference;
+    private DatabaseReference recentDatabaseReference;
 
     private String dateTime = new SimpleDateFormat("dd/MM/yyy hh:mm:ss a", Locale.getDefault()).format(new Date());
     private String today = new SimpleDateFormat("dd-MM-yyy", Locale.getDefault()).format(new Date());
@@ -55,23 +54,14 @@ public class LocationViewModel extends AndroidViewModel {
         super(application);
     }
 
+    //Requesting Location from device
     public void checkLocation() {
         locationManager = (LocationManager) getApplication().getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(@NonNull Location location) {
-                locationData.setValue(location.toString());
+                locationLiveData.setValue(location.toString());
                 dataUpload();
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
             }
 
             @Override
@@ -81,39 +71,43 @@ public class LocationViewModel extends AndroidViewModel {
         };
 
         if (ContextCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            permission.setValue(false);
+            permissionLiveData.setValue(false);
         } else {
-            permission.setValue(true);
+            permissionLiveData.setValue(true);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000, 0, locationListener);
         }
     }
 
+    //Uploading Location and Recent Data to Firebase
     public void dataUpload() {
-        databaseReference = FirebaseDatabase.getInstance("https://locationtracker-8c20b-default-rtdb.firebaseio.com/").getReference("locationData");
-        recentDataReference = FirebaseDatabase.getInstance("https://locationtracker-8c20b-default-rtdb.firebaseio.com/").getReference("recentData");
+        locationDatabaseReference = FirebaseDatabase.getInstance("https://locationtracker-8c20b-default-rtdb.firebaseio.com/").getReference("locationData");
+        recentDatabaseReference = FirebaseDatabase.getInstance("https://locationtracker-8c20b-default-rtdb.firebaseio.com/").getReference("recentData");
 
         dateTime = new SimpleDateFormat("dd/MM/yyy hh:mm:ss a", Locale.getDefault()).format(new Date());
-        locationDetail = new LocationDetail(locationData.getValue(), dateTime);
+        locationDetail = new LocationDetail(locationLiveData.getValue(), dateTime);
         recentData = new RecentData(dateTime);
 
-        databaseReference.child(today).child(String.valueOf(System.nanoTime())).setValue(locationDetail);
-        recentDataReference.child(today).setValue(dateTime);
+        locationDatabaseReference.child(today).child(String.valueOf(System.nanoTime())).setValue(locationDetail);
+        recentDatabaseReference.child(today).setValue(dateTime);
 
-        dataUploaded.setValue(true);
+        dataUploadedLiveData.setValue(true);
     }
 
+    //Fetching Location count from Firebase
     public void getData() {
         newLocationList.clear();
-        databaseReference = FirebaseDatabase.getInstance("https://locationtracker-8c20b-default-rtdb.firebaseio.com/").getReference("locationData/" + today + "/");
-        databaseReference.addValueEventListener(new ValueEventListener() {
+
+        locationDatabaseReference = FirebaseDatabase.getInstance("https://locationtracker-8c20b-default-rtdb.firebaseio.com/").getReference("locationData/" + today + "/");
+        locationDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 newLocationList.clear();
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     locationDetail = ds.getValue(LocationDetail.class);
                     newLocationList.add(locationDetail);
-                    uploadCounts.setValue(String.valueOf(newLocationList.size()));
-                    getRecentTime();
+                    uploadCountsLiveData.setValue(String.valueOf(newLocationList.size()));
+
+                    getRecentActivity();
                 }
             }
 
@@ -125,13 +119,14 @@ public class LocationViewModel extends AndroidViewModel {
 
     }
 
-    public void getRecentTime() {
-        recentDataReference = FirebaseDatabase.getInstance("https://locationtracker-8c20b-default-rtdb.firebaseio.com/").getReference("recentData/" + today + "/");
-        recentDataReference.addValueEventListener(new ValueEventListener() {
+    //Fetching Recent Activity from Firebase
+    public void getRecentActivity() {
+        recentDatabaseReference = FirebaseDatabase.getInstance("https://locationtracker-8c20b-default-rtdb.firebaseio.com/").getReference("recentData/" + today + "/");
+        recentDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
-                    recentUpload.setValue(dataSnapshot.getValue().toString());
+                    recentUploadLiveData.setValue(dataSnapshot.getValue().toString());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

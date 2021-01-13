@@ -12,11 +12,4 @@ public class LocationDetail {
         this.updatedTime = updatedTime;
     }
 
-    public String getLocation() {
-        return location;
-    }
-
-    public String getUpdatedTime() {
-        return updatedTime;
-    }
 }

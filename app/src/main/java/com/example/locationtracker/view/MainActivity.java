@@ -30,10 +30,11 @@ public class MainActivity extends AppCompatActivity {
 
         countText = findViewById(R.id.counts);
         lastUploadText = findViewById(R.id.lastUpload);
+
         locationViewModel = new ViewModelProvider(this).get(LocationViewModel.class);
         locationViewModel.checkLocation();
         locationViewModel.getData();
-        locationViewModel.getRecentTime();
+        locationViewModel.getRecentActivity();
 
         observeViewModel();
     }
@@ -47,39 +48,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Observing LiveData from ViewModel
     public void observeViewModel() {
-        locationViewModel.permission.observe(this, permissionGranted -> {
+        locationViewModel.permissionLiveData.observe(this, permissionGranted -> {
             if (!permissionGranted && permissionGranted != null) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             }
         });
 
-        locationViewModel.locationData.observe(this, hasData -> {
+        locationViewModel.locationLiveData.observe(this, hasData -> {
             if (hasData != null) {
                 Toast.makeText(getApplication(), "Location Fetched", Toast.LENGTH_SHORT).show();
             }
         });
 
-        locationViewModel.dataUploaded.observe(this, dataUploaded -> {
+        locationViewModel.dataUploadedLiveData.observe(this, dataUploaded -> {
             if (dataUploaded) {
                 Snackbar.make(findViewById(android.R.id.content), "Data Uploaded to cloud", Snackbar.LENGTH_LONG)
                         .setBackgroundTint(Color.parseColor("#534BAE"))
                         .setTextColor(Color.parseColor("#ffffff")).show();
                 locationViewModel.getData();
-                locationViewModel.getRecentTime();
+                locationViewModel.getRecentActivity();
             }
         });
 
-        locationViewModel.uploadCounts.observe(this, counts -> {
+        locationViewModel.uploadCountsLiveData.observe(this, counts -> {
             if (counts != null) {
                 countText.setText(counts);
-                locationViewModel.getRecentTime();
+                locationViewModel.getRecentActivity();
             } else {
                 countText.setText("No Data");
             }
         });
 
-        locationViewModel.recentUpload.observe(this, recent -> {
+        locationViewModel.recentUploadLiveData.observe(this, recent -> {
             if (recent != null) {
                 lastUploadText.setText(recent);
             } else {

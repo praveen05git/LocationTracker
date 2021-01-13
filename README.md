@@ -13,7 +13,8 @@
 - Checks location every 30 seconds
 - Checks location when user changes location
 - Uploads the Location and Recent Uploaded time to Cloud
-- Shows Number of Data uploaded Today
+- Shows the number of Data uploaded Today
+- Shows Today's Recent Activity
 </br>
 
 ## Tech stack
@@ -21,5 +22,5 @@
 - Java, MVVM Architecture based
 - Used AndroidViewModel for Location Fetching and Data Uploads
 - Used Firebase Realtime Database for Cloud storage and Retrieval
-- Implemented MutableLiveData and Observed it for displaying required information in a Reactive manner
+- Implemented MutableLiveData and Observed it for fetching required information in a Reactive manner
 </br>

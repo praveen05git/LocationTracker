@@ -10,7 +10,4 @@ public class RecentData {
         this.recentTime = recentTime;
     }
 
-    public String getRecentTime() {
-        return recentTime;
-    }
 }
